@@ -1,0 +1,26 @@
+name: Setup and Trigger Error
+
+on: [push]
+
+jobs:
+  setup_and_run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      
+      - name: Create Directories
+        run: mkdir -p .config/some_directory
+      
+      - name: Create main.py with intentional error
+        run: |
+          echo 'import math\n\ndef divide_by_zero():\n    return 1 / 0\n\nif __name__ == "__main__":\n    try:\n        divide_by_zero()\n    except ZeroDivisionError as e:\n        print("Error caught: ", e)' > main.py
+      
+      - name: Run main.py and catch errors
+        run: python main.py
+        continue-on-error: true
